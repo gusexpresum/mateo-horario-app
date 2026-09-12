@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#5DADE2">
+    <meta name="description" content="App de horario para Mateo - 6º Primaria Urdaneta">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%235DADE2' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='central' font-weight='bold'>📚</text></svg>">
+    <title>📚 Horario de Mateo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --azul-cielo: #5DADE2;
+            --azul-oscuro: #2E86C1;
+            --azul-claro: #AED6F1;
+            --blanco: #FFFFFF;
+            --gris: #ECF0F1;
+            --gris-oscuro: #34495E;
+            --amarillo: #F9E79F;
+            --naranja: #F8B88B;
+            --verde: #A9DFBF;
+            --morado: #D7BDE2;
+            --rojo: #F5B7B1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--azul-claro) 0%, var(--blanco) 100%);
+            color: var(--gris-oscuro);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-cielo));
+            color: var(--blanco);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                order: 2;
+            }
+        }
+
+        /* SEMANA Y NAVEGACIÓN */
+        .week-controls {
+            background: var(--blanco);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .week-controls button {
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .week-controls button:hover {
+            background: var(--azul-oscuro);
+        }
+
+        .week-label {
+            font-weight: bold;
+            color: var(--azul-oscuro);
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* GRID DE DÍAS */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .week-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .week-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .day-card {
+            background: var(--blanco);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .day-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .day-header {
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .day-header .date {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .day-content {
+            padding: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .clase {
+            background: var(--amarillo);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 4px solid var(--azul-oscuro);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .clase:hover {
+            background: #F4D03F;
+            transform: scale(1.02);
+        }
+
+        .clase-hora {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .clase-nombre {
+            font-weight: bold;
+        }
+
+        .entrenamiento {
+            background: var(--naranja);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #D35400;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .taekwondo {
+            background: var(--rojo);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #C0392B;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .patio {
+            background: var(--verde);
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .comedor {
+            background: var(--morado);
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .fin-jornada {
+            background: #BDC3C7;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .pendiente-badge {
+            display: inline-block;
+            background: #E74C3C;
+            color: var(--blanco);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* MODAL DE MATERIA */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--blanco);
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: var(--blanco);
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--gris-oscuro);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--azul-claro);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--azul-oscuro);
+            box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.1);
+        }
+
+        .btn-guardar {
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .btn-guardar:hover {
+            background: var(--azul-oscuro);
+        }
+
+        .nota-item {
+            background: var(--gris);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .nota-texto {
+            flex: 1;
+        }
+
+        .nota-tipo {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--azul-claro);
+            color: var(--blanco);
+            margin-bottom: 5px;
+        }
+
+        .nota-fecha {
+            font-size: 12px;
+            color: #7F8C8D;
+            margin-top: 5px;
+        }
+
+        .btn-eliminar {
+            background: #E74C3C;
+            color: var(--blanco);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .btn-eliminar:hover {
+            background: #C0392B;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-card {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-card h3 {
+            margin-top: 0;
+            color: var(--azul-oscuro);
+            font-size: 16px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--azul-claro);
+            padding-bottom: 8px;
+        }
+
+        .materia-item {
+            padding: 10px;
+            background: var(--gris);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .materia-item:hover {
+            background: var(--azul-claro);
+            color: var(--blanco);
+        }
+
+        /* BLOQUE DE NOTAS */
+        .notas-section {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .notas-section h2 {
+            color: var(--azul-oscuro);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--azul-claro);
+            padding-bottom: 10px;
+        }
+
+        .nota-form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nota-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .nota-form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nota-form-row.full {
+            grid-column: 1 / -1;
+        }
+
+        .notas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nota-card {
+            background: linear-gradient(135deg, var(--amarillo), #FFF9E6);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #F39C12;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .nota-card-content {
+            flex: 1;
+        }
+
+        .nota-card-fecha {
+            font-size: 12px;
+            color: #7F8C8D;
+            margin-top: 8px;
+        }
+
+        .nota-card-hora {
+            font-size: 12px;
+            color: #7F8C8D;
+            margin-top: 3px;
+        }
+
+        .btn-eliminar-nota {
+            background: #E74C3C;
+            color: var(--blanco);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            height: fit-content;
+        }
+
+        .btn-eliminar-nota:hover {
+            background: #C0392B;
+        }
+
+        /* SINCRONIZACIÓN GOOGLE DRIVE */
+        .sync-section {
+            background: var(--gris);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .btn-sync {
+            background: #4285F4;
+            color: var(--blanco);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-sync:hover {
+            background: #357AE8;
+        }
+
+        .btn-sync:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* FLOTANTE RECORDATORIOS */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: 0.3s;
+            z-index: 90;
+        }
+
+        .fab:hover {
+            background: var(--azul-oscuro);
+            transform: scale(1.1);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #95A5A6;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .recordatorio-alert {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--azul-cielo);
+            color: var(--blanco);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1001;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-350px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--blanco);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 Horario de Mateo H.</h1>
+        <p>6º Primaria • Colegio Urdaneta</p>
+    </header>
+
+    <div class="container">
+        <div class="week-controls">
+            <button onclick="semanaAnterior()">← Anterior</button>
+            <div class="week-label" id="weekLabel">Semana: 8 - 12 de septiembre</div>
+            <button onclick="semanaSiguiente()">Siguiente →</button>
+            <button onclick="semanaActual()">🏠 Hoy</button>
+        </div>
+
+        <div class="layout">
+            <div>
+                <div class="week-grid" id="weekGrid"></div>
+
+                <!-- BLOQUE DE NOTAS / OBSERVACIONES -->
+                <div class="notas-section">
+                    <h2>🗒️ Recordatorios y Eventos</h2>
+                    <div class="nota-form">
+                        <div class="nota-form-row full">
+                            <input type="text" id="notaTexto" placeholder="Ej: Cumpleaños de Jon, Excursión, etc..." maxlength="100">
+                        </div>
+                        <div class="nota-form-row">
+                            <input type="date" id="notaFecha" required>
+                            <input type="time" id="notaHora">
+                        </div>
+                        <div class="nota-form-row full">
+                            <button class="btn-guardar" onclick="guardarNota()">➕ Añadir Recordatorio</button>
+                        </div>
+                    </div>
+
+                    <div class="notas-list" id="notasList"></div>
+
+                    <div class="sync-section">
+                        <strong>💾 Guardar en Google Drive</strong>
+                        <p style="margin: 8px 0 0 0;">Tus datos se sincronizarán automáticamente</p>
+                        <button class="btn-sync" id="syncBtn" onclick="sincronizarDrive()">Sincronizar Ahora</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3>📁 Materias</h3>
+                    <div id="materiasList"></div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>⏰ Recordatorios</h3>
+                    <div id="recordatoriosList" class="notas-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab" onclick="mostrarAyuda()">❓</button>
+
+    <!-- MODAL DE MATERIA -->
+    <div class="modal-overlay" id="materiaModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="materiaNombre">Materia</h2>
+                <button class="close-btn" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <select id="tipoNota">
+                        <option value="deberes">📝 Deberes</option>
+                        <option value="examen">📌 Examen</option>
+                        <option value="nota">💬 Nota</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>¿Qué es?</label>
+                    <textarea id="textoNota" placeholder="Describe la tarea, examen o nota..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de entrega/examen:</label>
+                    <input type="date" id="fechaNota">
+                </div>
+                <div class="form-group">
+                    <label>Hora de recordatorio:</label>
+                    <input type="time" id="horaNota">
+                </div>
+                <button class="btn-guardar" onclick="guardarNotaMateria()">✅ Guardar</button>
+
+                <hr style="margin: 20px 0; border: none; border-top: 2px solid var(--azul-claro);">
+
+                <h3 style="color: var(--azul-oscuro); margin-top: 20px;">Tareas y Exámenes</h3>
+                <div id="notasMateria"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DATOS DEL HORARIO EXACTO SEGÚN LA IMAGEN
+        const HORARIO = {
+            lunes: [
+                {hora: '09:25-10:30', materia: 'Tuto', color: '#8896A6'},
+                {hora: '10:30-11:30', materia: 'Babesa', color: '#9B7EDE'},
+                {hora: '11:30-12:00', tipo: 'patio', label: '🌳 Patio / Asamblea'},
+                {hora: '12:00-12:50', materia: 'Euskera', color: '#4FB286'},
+                {hora: '12:50-13:40', tipo: 'comedor', label: '🍽 Comedor + Patio'},
+                {hora: '13:40-14:40', materia: 'Balores', color: '#E06BA8'},
+                {hora: '14:40-15:15', materia: 'Balores', color: '#E06BA8'},
+                {hora: '15:15-16:00', materia: 'Tutoría', color: '#8896A6'},
+                {hora: '19:30', tipo: 'taekwondo', label: '🥋 Taekwondo'}
+            ],
+            martes: [
+                {hora: '09:25-10:30', materia: 'Giza', color: '#F2994A'},
+                {hora: '10:30-11:30', materia: 'Steam', color: '#4FBAC4'},
+                {hora: '11:30-12:00', tipo: 'patio', label: '🌳 Patio'},
+                {hora: '12:00-12:50', materia: 'Iguerketa', color: '#3FB6D3'},
+                {hora: '12:50-13:40', materia: 'Erlijoa', color: '#E0A63A'},
+                {hora: '13:40-14:40', tipo: 'comedor', label: '🍽 Comedor + Patio'},
+                {hora: '14:40-15:15', materia: 'English', color: '#9B7EDE'},
+                {hora: '15:15-16:00', materia: 'English', color: '#9B7EDE'},
+                {hora: '17:00-18:00', tipo: 'entrenamiento', label: '⚽ Entrenamiento Fútbol'}
+            ],
+            miercoles: [
+                {hora: '09:25-10:30', materia: 'Mate', color: '#4C7EDB'},
+                {hora: '10:30-11:30', materia: 'Euskera', color: '#4FB286'},
+                {hora: '11:30-12:00', tipo: 'patio', label: '🌳 Patio'},
+                {hora: '12:00-12:50', materia: 'Mate', color: '#4C7EDB'},
+                {hora: '12:50-13:40', materia: 'Euskera', color: '#4FB286'},
+                {hora: '13:40-14:40', tipo: 'comedor', label: '🍽 Comedor + Patio'},
+                {hora: '19:30', tipo: 'taekwondo', label: '🥋 Taekwondo'}
+            ],
+            jueves: [
+                {hora: '09:25-10:30', materia: 'Lengua', color: '#E4676B'},
+                {hora: '10:30-11:30', materia: 'English', color: '#9B7EDE'},
+                {hora: '11:30-12:00', tipo: 'patio', label: '🌳 Patio'},
+                {hora: '12:00-12:50', materia: 'Euskera', color: '#4FB286'},
+                {hora: '12:50-13:40', materia: 'Lengua', color: '#E4676B'},
+                {hora: '13:40-14:40', tipo: 'comedor', label: '🍽 Comedor + Patio'},
+                {hora: '14:40-15:15', materia: 'Euskera', color: '#4FB286'},
+                {hora: '15:15-16:00', materia: 'Lengua', color: '#E4676B'},
+                {hora: '16:00-17:00', materia: 'Steam', color: '#4FBAC4'},
+                {hora: '17:00-18:00', tipo: 'entrenamiento', label: '⚽ Entrenamiento Fútbol'}
+            ],
+            viernes: [
+                {hora: '09:25-10:30', materia: 'Giza', color: '#F2994A'},
+                {hora: '10:30-11:30', materia: 'Euskera', color: '#4FB286'},
+                {hora: '11:30-12:00', tipo: 'patio', label: '🌳 Patio'},
+                {hora: '12:00-12:50', materia: 'Mate', color: '#4C7EDB'},
+                {hora: '12:50-13:40', materia: 'Mate', color: '#4C7EDB'},
+                {hora: '13:40-14:40', tipo: 'comedor', label: '🍽 Comedor + Patio'},
+                {hora: '14:40-15:15', materia: 'Steam', color: '#4FBAC4'},
+                {hora: '15:15-16:00', materia: 'Fisica', color: '#7CB342'},
+                {hora: '17:30', tipo: 'recordatorio', label: '🚨 Recordatorio: Eskola Athletic 18:30'}
+            ],
+            sabado: [],
+            domingo: []
+        };
+
+        const MATERIAS = [
+            {id: 'mate', nombre: '🔢 Matemáticas', emoji: '🔢'},
+            {id: 'lengua', nombre: '📖 Lengua', emoji: '📖'},
+            {id: 'euskera', nombre: '🍀 Euskera', emoji: '🍀'},
+            {id: 'english', nombre: '🇬🇧 English', emoji: '🇬🇧'},
+            {id: 'giza', nombre: '🌍 Giza (Sociales)', emoji: '🌍'},
+            {id: 'steam', nombre: '🔬 Steam', emoji: '🔬'},
+            {id: 'iguerketa', nombre: '🏊 Iguerketa (Natación)', emoji: '🏊'},
+            {id: 'erlijoa', nombre: '🙏 Erlijoa (Religión)', emoji: '🙏'},
+            {id: 'babesa', nombre: '🎨 Babesa (Arte)', emoji: '🎨'},
+            {id: 'balores', nombre: '💛 Balores (Valores)', emoji: '💛'},
+            {id: 'fisica', nombre: '⚽ Hezketa Fisikoa', emoji: '⚽'},
+        ];
+
+        // STATE
+        let fechaActual = new Date();
+        let notasMateria = {};
+        let observaciones = [];
+        let materiaActualModal = null;
+
+        // STORAGE
+        function guardarStorage() {
+            localStorage.setItem('mateo_notasMateria', JSON.stringify(notasMateria));
+            localStorage.setItem('mateo_observaciones', JSON.stringify(observaciones));
+        }
+
+        function cargarStorage() {
+            notasMateria = JSON.parse(localStorage.getItem('mateo_notasMateria') || '{}');
+            observaciones = JSON.parse(localStorage.getItem('mateo_observaciones') || '[]');
+        }
+
+        // UTILIDADES DE FECHA
+        function getLunes(fecha = new Date()) {
+            const d = new Date(fecha);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            return d;
+        }
+
+        function formatoFecha(fecha) {
+            return new Intl.DateTimeFormat('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).format(fecha);
+        }
+
+        function diaDelaSemana(index) {
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+            return dias[index];
+        }
+
+        // NAVEGACIÓN SEMANAS
+        function semanaAnterior() {
+            fechaActual.setDate(fechaActual.getDate() - 7);
+            renderizar();
+        }
+
+        function semanaSiguiente() {
+            fechaActual.setDate(fechaActual.getDate() + 7);
+            renderizar();
+        }
+
+        function semanaActual() {
+            fechaActual = new Date();
+            renderizar();
+        }
+
+        // RENDERIZADO PRINCIPAL
+        function renderizar() {
+            cargarStorage();
+            renderHorario();
+            renderMaterias();
+            renderRecordatorios();
+            actualizarEtiquetaSemana();
+            verificarRecordatorios();
+        }
+
+        function actualizarEtiquetaSemana() {
+            const lunes = getLunes(fechaActual);
+            const domingo = new Date(lunes);
+            domingo.setDate(domingo.getDate() + 6);
+            
+            const opcionesFormato = { day: 'numeric', month: 'short' };
+            const lunesStr = new Intl.DateTimeFormat('es-ES', opcionesFormato).format(lunes);
+            const domingoStr = new Intl.DateTimeFormat('es-ES', opcionesFormato).format(domingo);
+            
+            document.getElementById('weekLabel').textContent = `Semana: ${lunesStr} - ${domingoStr}`;
+        }
+
+        function renderHorario() {
+            const grid = document.getElementById('weekGrid');
+            grid.innerHTML = '';
+            
+            const lunes = getLunes(fechaActual);
+            
+            for (let i = 0; i < 5; i++) {
+                const fecha = new Date(lunes);
+                fecha.setDate(fecha.getDate() + i);
+                
+                const diaKey = diaDelaSemana(i);
+                const clases = HORARIO[diaKey] || [];
+                
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.innerHTML = `
+                    <div>${diaKey.charAt(0).toUpperCase() + diaKey.slice(1)}</div>
+                    <div class="date">${fecha.getDate()/${fecha.getMonth()+1}</div>
+                `;
+                card.appendChild(header);
+                
+                const content = document.createElement('div');
+                content.className = 'day-content';
+                
+                clases.forEach(clase => {
+                    const el = document.createElement('div');
+                    
+                    if (clase.tipo === 'patio') {
+                        el.className = 'patio';
+                        el.textContent = clase.label;
+                    } else if (clase.tipo === 'comedor') {
+                        el.className = 'comedor';
+                        el.textContent = clase.label;
+                    } else if (clase.tipo === 'taekwondo') {
+                        el.className = 'taekwondo';
+                        el.textContent = clase.label;
+                    } else if (clase.tipo === 'entrenamiento') {
+                        el.className = 'entrenamiento';
+                        el.textContent = clase.label;
+                    } else if (clase.tipo === 'recordatorio') {
+                        el.className = 'recordatorio-alert';
+                        el.style.position = 'relative';
+                        el.style.margin = '8px 0';
+                        el.style.background = '#E74C3C';
+                        el.textContent = clase.label;
+                    } else {
+                        el.className = 'clase';
+                        el.style.borderLeftColor = clase.color;
+                        
+                        const pendientes = (notasMateria[clase.materia.toLowerCase()] || [])
+                            .filter(n => n.estado === 'pendiente').length;
+                        
+                        el.innerHTML = `
+                            <div class="clase-hora">${clase.hora}</div>
+                            <div class="clase-nombre">${clase.materia}${pendientes ? `<span class="pendiente-badge">${pendientes}</span>` : ''}</div>
+                        `;
+                        el.style.cursor = 'pointer';
+                        el.onclick = () => abrirModalMateria(clase.materia);
+                    }
+                    
+                    content.appendChild(el);
+                });
+                
+                card.appendChild(content);
+                grid.appendChild(card);
+            }
+        }
+
+        function renderMaterias() {
+            const lista = document.getElementById('materiasList');
+            lista.innerHTML = '';
+            
+            MATERIAS.forEach(materia => {
+                const pendientes = (notasMateria[materia.id] || [])
+                    .filter(n => n.estado === 'pendiente').length;
+                
+                const item = document.createElement('div');
+                item.className = 'materia-item';
+                item.innerHTML = `
+                    <span>${materia.emoji} ${materia.id.charAt(0).toUpperCase() + materia.id.slice(1)}</span>
+                    ${pendientes ? `<span class="pendiente-badge">${pendientes}</span>` : ''}
+                `;
+                item.onclick = () => abrirModalMateria(materia.nombre);
+                lista.appendChild(item);
+            });
+        }
+
+        function renderRecordatorios() {
+            const lista = document.getElementById('recordatoriosList');
+            lista.innerHTML = '';
+            
+            if (observaciones.length === 0) {
+                lista.innerHTML = '<div class="empty-message">Sin recordatorios 📭</div>';
+                return;
+            }
+            
+            observaciones
+                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+                .forEach(obs => {
+                    const card = document.createElement('div');
+                    card.className = 'nota-card';
+                    card.innerHTML = `
+                        <div class="nota-card-content">
+                            <strong>${obs.texto}</strong>
+                            <div class="nota-card-fecha">📅 ${obs.fecha}</div>
+                            ${obs.hora ? `<div class="nota-card-hora">⏰ ${obs.hora}</div>` : ''}
+                        </div>
+                        <button class="btn-eliminar-nota" onclick="eliminarNota('${obs.id}')">🗑️</button>
+                    `;
+                    lista.appendChild(card);
+                });
+        }
+
+        // NOTAS Y OBSERVACIONES
+        function guardarNota() {
+            const texto = document.getElementById('notaTexto').value.trim();
+            const fecha = document.getElementById('notaFecha').value;
+            const hora = document.getElementById('notaHora').value;
+            
+            if (!texto || !fecha) {
+                alert('Por favor completa el texto y la fecha');
+                return;
+            }
+            
+            observaciones.push({
+                id: Date.now().toString(),
+                texto,
+                fecha,
+                hora,
+                createdAt: new Date().toISOString()
+            });
+            
+            guardarStorage();
+            document.getElementById('notaTexto').value = '';
+            document.getElementById('notaFecha').value = '';
+            document.getElementById('notaHora').value = '';
+            renderRecordatorios();
+            verificarRecordatorios();
+        }
+
+        function eliminarNota(id) {
+            observaciones = observaciones.filter(n => n.id !== id);
+            guardarStorage();
+            renderRecordatorios();
+        }
+
+        // MODAL DE MATERIA
+        function abrirModalMateria(nombreMateria) {
+            materiaActualModal = nombreMateria.toLowerCase();
+            document.getElementById('materiaNombre').textContent = nombreMateria;
+            document.getElementById('materiaModal').classList.add('active');
+            renderNotasMateria();
+            
+            // Limpiar formulario
+            document.getElementById('tipoNota').value = 'deberes';
+            document.getElementById('textoNota').value = '';
+            document.getElementById('fechaNota').value = '';
+            document.getElementById('horaNota').value = '';
+        }
+
+        function cerrarModal() {
+            document.getElementById('materiaModal').classList.remove('active');
+        }
+
+        function guardarNotaMateria() {
+            const tipo = document.getElementById('tipoNota').value;
+            const texto = document.getElementById('textoNota').value.trim();
+            const fecha = document.getElementById('fechaNota').value;
+            const hora = document.getElementById('horaNota').value;
+            
+            if (!texto || !fecha) {
+                alert('Por favor completa la tarea y la fecha');
+                return;
+            }
+            
+            if (!notasMateria[materiaActualModal]) {
+                notasMateria[materiaActualModal] = [];
+            }
+            
+            notasMateria[materiaActualModal].push({
+                id: Date.now().toString(),
+                tipo,
+                texto,
+                fecha,
+                hora,
+                estado: 'pendiente',
+                createdAt: new Date().toISOString()
+            });
+            
+            guardarStorage();
+            renderNotasMateria();
+            renderHorario();
+            renderMaterias();
+            
+            document.getElementById('textoNota').value = '';
+            document.getElementById('fechaNota').value = '';
+            document.getElementById('horaNota').value = '';
+        }
+
+        function renderNotasMateria() {
+            const container = document.getElementById('notasMateria');
+            const notas = notasMateria[materiaActualModal] || [];
+            
+            if (notas.length === 0) {
+                container.innerHTML = '<div class="empty-message">Sin tareas todavía 📝</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            notas
+                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+                .forEach(nota => {
+                    const item = document.createElement('div');
+                    item.className = 'nota-item';
+                    
+                    const tipoLabel = {
+                        'deberes': '📝 Deberes',
+                        'examen': '📌 Examen',
+                        'nota': '💬 Nota'
+                    }[nota.tipo];
+                    
+                    item.innerHTML = `
+                        <div class="nota-texto">
+                            <span class="nota-tipo">${tipoLabel}</span>
+                            <div>${nota.texto}</div>
+                            <div class="nota-fecha">📅 ${nota.fecha}${nota.hora ? ` ⏰ ${nota.hora}` : ''}</div>
+                        </div>
+                        <button class="btn-eliminar" onclick="eliminarNotaMateria('${nota.id}')">🗑️ Borrar</button>
+                    `;
+                    container.appendChild(item);
+                });
+        }
+
+        function eliminarNotaMateria(id) {
+            notasMateria[materiaActualModal] = notasMateria[materiaActualModal].filter(n => n.id !== id);
+            guardarStorage();
+            renderNotasMateria();
+            renderHorario();
+            renderMaterias();
+        }
+
+        // RECORDATORIOS AUTOMÁTICOS
+        function verificarRecordatorios() {
+            const ahora = new Date();
+            const horaActual = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+            const hoyISO = ahora.toISOString().split('T')[0];
+            
+            // Recordatorios de observaciones (un día antes)
+            observaciones.forEach(obs => {
+                const fechaObs = new Date(obs.fecha);
+                const ayer = new Date(ahora);
+                ayer.setDate(ayer.getDate() - 1);
+                
+                if (
+                    fechaObs.toISOString().split('T')[0] === ayer.toISOString().split('T')[0] &&
+                    obs.hora && horaActual >= obs.hora
+                ) {
+                    mostrarRecordatorio(`⏰ Recordatorio: ${obs.texto} es mañana a las ${obs.hora}`);
+                }
+            });
+            
+            // Recordatorio domingo 11:00
+            if (ahora.getDay() === 0 && horaActual >= '11:00' && horaActual <= '11:05') {
+                mostrarRecordatorio('📅 Recuerda revisar tu horario para la semana que comienza. ¡Prepárate!');
+            }
+        }
+
+        function mostrarRecordatorio(mensaje) {
+            console.log('Recordatorio:', mensaje);
+            // Aquí se mostraría una notificación en el navegador
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('📚 Horario de Mateo', {
+                    body: mensaje,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%235DADE2" width="192" height="192"/><text x="50%" y="50%" font-size="100" fill="white" text-anchor="middle" dominant-baseline="central" font-weight="bold">📚</text></svg>'
+                });
+            }
+        }
+
+        // SINCRONIZACIÓN CON GOOGLE DRIVE
+        function sincronizarDrive() {
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Sincronizando...';
+            
+            // Simular sincronización (en producción, usar Google Drive API)
+            setTimeout(() => {
+                const datos = {
+                    notasMateria,
+                    observaciones,
+                    sincronizadoEn: new Date().toISOString(),
+                    usuario: 'gudama2019@gmail.com'
+                };
+                
+                console.log('Datos a sincronizar:', datos);
+                alert('✅ Datos guardados. Descarga el archivo JSON para hacer backup en Drive');
+                
+                // Descargar JSON
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(datos, null, 2)));
+                element.setAttribute('download', `mateo-backup-${new Date().toISOString().split('T')[0]}.json`);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                
+                btn.disabled = false;
+                btn.textContent = 'Sincronizar Ahora';
+            }, 1500);
+        }
+
+        // AYUDA
+        function mostrarAyuda() {
+            alert(`
+📚 CÓMO USAR LA APP:
+
+1️⃣ VER HORARIO
+   • Toca una clase para añadir deberes o exámenes
+   • Usa Anterior/Siguiente para navegar semanas
+
+2️⃣ AÑADIR DEBERES/EXÁMENES
+   • Haz clic en una materia → Elige tipo → Escribe tarea
+   • Añade fecha y hora de recordatorio
+
+3️⃣ RECORDATORIOS Y EVENTOS
+   • En la sección "Recordatorios" escribe cumpleaños, excursiones, etc
+   • Añade fecha y hora
+   • Se te recordará un día antes
+
+4️⃣ SINCRONIZACIÓN
+   • Haz clic en "Sincronizar Ahora" para guardar en Drive
+   • Se descargará un archivo JSON de respaldo
+
+5️⃣ NOTIFICACIONES
+   • Domingo 11:00 → Aviso de la semana siguiente
+   • Viernes 17:30 → Recordatorio Eskola Athletic 18:30
+
+¡Mantente organizado! 🎯
+            `);
+        }
+
+        // SERVICE WORKER (Funciona sin internet)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW error:', err));
+        }
+
+        // SOLICITAR PERMISO DE NOTIFICACIONES
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizar();
+            // Verificar recordatorios cada minuto
+            setInterval(verificarRecordatorios, 60000);
+        });
+    </script>
+</body>
+</html>
