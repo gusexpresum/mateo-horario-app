@@ -60,7 +60,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 20px auto;
             padding: 0 15px;
         }
@@ -71,7 +71,7 @@
             gap: 20px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1200px) {
             .layout {
                 grid-template-columns: 1fr;
             }
@@ -80,7 +80,6 @@
             }
         }
 
-        /* SEMANA Y NAVEGACIÓN */
         .week-controls {
             background: var(--blanco);
             padding: 15px;
@@ -117,24 +116,11 @@
             min-width: 200px;
         }
 
-        /* GRID DE DÍAS */
         .week-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
-        }
-
-        @media (max-width: 1024px) {
-            .week-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .week-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .day-card {
@@ -169,6 +155,7 @@
             padding: 12px;
             max-height: 500px;
             overflow-y: auto;
+            min-height: 150px;
         }
 
         .clase {
@@ -180,7 +167,7 @@
             transition: 0.2s;
             border-left: 4px solid var(--azul-oscuro);
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .clase:hover {
@@ -196,6 +183,7 @@
 
         .clase-nombre {
             font-weight: bold;
+            font-size: 12px;
         }
 
         .entrenamiento {
@@ -204,7 +192,7 @@
             margin-bottom: 8px;
             border-radius: 8px;
             border-left: 4px solid #D35400;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
         }
 
@@ -214,7 +202,7 @@
             margin-bottom: 8px;
             border-radius: 8px;
             border-left: 4px solid #C0392B;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
         }
 
@@ -224,7 +212,7 @@
             margin-bottom: 8px;
             border-radius: 8px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -234,7 +222,7 @@
             margin-bottom: 8px;
             border-radius: 8px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -248,21 +236,28 @@
             opacity: 0.7;
         }
 
+        .sin-clases {
+            text-align: center;
+            padding: 20px 10px;
+            color: #95A5A6;
+            font-style: italic;
+            font-size: 12px;
+        }
+
         .pendiente-badge {
             display: inline-block;
             background: #E74C3C;
             color: var(--blanco);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             text-align: center;
-            line-height: 20px;
+            line-height: 18px;
             font-size: 10px;
             font-weight: bold;
             margin-left: 5px;
         }
 
-        /* MODAL DE MATERIA */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -422,7 +417,6 @@
             background: #C0392B;
         }
 
-        /* SIDEBAR */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -455,7 +449,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .materia-item:hover {
@@ -463,7 +457,6 @@
             color: var(--blanco);
         }
 
-        /* BLOQUE DE NOTAS */
         .notas-section {
             background: var(--blanco);
             border-radius: 12px;
@@ -550,7 +543,6 @@
             background: #C0392B;
         }
 
-        /* SINCRONIZACIÓN GOOGLE DRIVE */
         .sync-section {
             background: var(--gris);
             padding: 15px;
@@ -581,7 +573,6 @@
             cursor: not-allowed;
         }
 
-        /* FLOTANTE RECORDATORIOS */
         .fab {
             position: fixed;
             bottom: 20px;
@@ -609,31 +600,7 @@
             color: #95A5A6;
             padding: 20px;
             font-style: italic;
-        }
-
-        .recordatorio-alert {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--azul-cielo);
-            color: var(--blanco);
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1001;
-            max-width: 300px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(-350px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            font-size: 12px;
         }
 
         .loading {
@@ -660,7 +627,7 @@
     <div class="container">
         <div class="week-controls">
             <button onclick="semanaAnterior()">← Anterior</button>
-            <div class="week-label" id="weekLabel">Semana: 8 - 12 de septiembre</div>
+            <div class="week-label" id="weekLabel">Semana: 8 - 14 de septiembre</div>
             <button onclick="semanaSiguiente()">Siguiente →</button>
             <button onclick="semanaActual()">🏠 Hoy</button>
         </div>
@@ -669,12 +636,11 @@
             <div>
                 <div class="week-grid" id="weekGrid"></div>
 
-                <!-- BLOQUE DE NOTAS / OBSERVACIONES -->
                 <div class="notas-section">
                     <h2>🗒️ Recordatorios y Eventos</h2>
                     <div class="nota-form">
                         <div class="nota-form-row full">
-                            <input type="text" id="notaTexto" placeholder="Ej: Cumpleaños de Jon, Excursión, etc..." maxlength="100">
+                            <input type="text" id="notaTexto" placeholder="Ej: Cumpleaños de Jon, Excursión, Partido, etc..." maxlength="100">
                         </div>
                         <div class="nota-form-row">
                             <input type="date" id="notaFecha" required>
@@ -711,7 +677,6 @@
 
     <button class="fab" onclick="mostrarAyuda()">❓</button>
 
-    <!-- MODAL DE MATERIA -->
     <div class="modal-overlay" id="materiaModal">
         <div class="modal">
             <div class="modal-header">
@@ -750,7 +715,6 @@
     </div>
 
     <script>
-        // DATOS DEL HORARIO EXACTO SEGÚN LA IMAGEN
         const HORARIO = {
             lunes: [
                 {hora: '09:25-10:30', materia: 'Tuto', color: '#8896A6'},
@@ -824,13 +788,11 @@
             {id: 'fisica', nombre: '⚽ Hezketa Fisikoa', emoji: '⚽'},
         ];
 
-        // STATE
         let fechaActual = new Date();
         let notasMateria = {};
         let observaciones = [];
         let materiaActualModal = null;
 
-        // STORAGE
         function guardarStorage() {
             localStorage.setItem('mateo_notasMateria', JSON.stringify(notasMateria));
             localStorage.setItem('mateo_observaciones', JSON.stringify(observaciones));
@@ -841,7 +803,6 @@
             observaciones = JSON.parse(localStorage.getItem('mateo_observaciones') || '[]');
         }
 
-        // UTILIDADES DE FECHA
         function getLunes(fecha = new Date()) {
             const d = new Date(fecha);
             const day = d.getDay();
@@ -850,21 +811,11 @@
             return d;
         }
 
-        function formatoFecha(fecha) {
-            return new Intl.DateTimeFormat('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            }).format(fecha);
-        }
-
         function diaDelaSemana(index) {
             const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
             return dias[index];
         }
 
-        // NAVEGACIÓN SEMANAS
         function semanaAnterior() {
             fechaActual.setDate(fechaActual.getDate() - 7);
             renderizar();
@@ -880,14 +831,12 @@
             renderizar();
         }
 
-        // RENDERIZADO PRINCIPAL
         function renderizar() {
             cargarStorage();
             renderHorario();
             renderMaterias();
             renderRecordatorios();
             actualizarEtiquetaSemana();
-            verificarRecordatorios();
         }
 
         function actualizarEtiquetaSemana() {
@@ -908,7 +857,8 @@
             
             const lunes = getLunes(fechaActual);
             
-            for (let i = 0; i < 5; i++) {
+            // Mostrar 7 días: lunes a domingo
+            for (let i = 0; i < 7; i++) {
                 const fecha = new Date(lunes);
                 fecha.setDate(fecha.getDate() + i);
                 
@@ -922,51 +872,56 @@
                 header.className = 'day-header';
                 header.innerHTML = `
                     <div>${diaKey.charAt(0).toUpperCase() + diaKey.slice(1)}</div>
-                    <div class="date">${fecha.getDate()/${fecha.getMonth()+1}</div>
+                    <div class="date">${fecha.getDate()}/${fecha.getMonth()+1}</div>
                 `;
                 card.appendChild(header);
                 
                 const content = document.createElement('div');
                 content.className = 'day-content';
                 
-                clases.forEach(clase => {
-                    const el = document.createElement('div');
-                    
-                    if (clase.tipo === 'patio') {
-                        el.className = 'patio';
-                        el.textContent = clase.label;
-                    } else if (clase.tipo === 'comedor') {
-                        el.className = 'comedor';
-                        el.textContent = clase.label;
-                    } else if (clase.tipo === 'taekwondo') {
-                        el.className = 'taekwondo';
-                        el.textContent = clase.label;
-                    } else if (clase.tipo === 'entrenamiento') {
-                        el.className = 'entrenamiento';
-                        el.textContent = clase.label;
-                    } else if (clase.tipo === 'recordatorio') {
-                        el.className = 'recordatorio-alert';
-                        el.style.position = 'relative';
-                        el.style.margin = '8px 0';
-                        el.style.background = '#E74C3C';
-                        el.textContent = clase.label;
-                    } else {
-                        el.className = 'clase';
-                        el.style.borderLeftColor = clase.color;
+                if (clases.length === 0) {
+                    const sinClases = document.createElement('div');
+                    sinClases.className = 'sin-clases';
+                    sinClases.textContent = 'Sin clases (Puedes añadir eventos)';
+                    content.appendChild(sinClases);
+                } else {
+                    clases.forEach(clase => {
+                        const el = document.createElement('div');
                         
-                        const pendientes = (notasMateria[clase.materia.toLowerCase()] || [])
-                            .filter(n => n.estado === 'pendiente').length;
+                        if (clase.tipo === 'patio') {
+                            el.className = 'patio';
+                            el.textContent = clase.label;
+                        } else if (clase.tipo === 'comedor') {
+                            el.className = 'comedor';
+                            el.textContent = clase.label;
+                        } else if (clase.tipo === 'taekwondo') {
+                            el.className = 'taekwondo';
+                            el.textContent = clase.label;
+                        } else if (clase.tipo === 'entrenamiento') {
+                            el.className = 'entrenamiento';
+                            el.textContent = clase.label;
+                        } else if (clase.tipo === 'recordatorio') {
+                            el.className = 'entrenamiento';
+                            el.style.background = '#E74C3C';
+                            el.textContent = clase.label;
+                        } else {
+                            el.className = 'clase';
+                            el.style.borderLeftColor = clase.color;
+                            
+                            const pendientes = (notasMateria[clase.materia.toLowerCase()] || [])
+                                .filter(n => n.estado === 'pendiente').length;
+                            
+                            el.innerHTML = `
+                                <div class="clase-hora">${clase.hora}</div>
+                                <div class="clase-nombre">${clase.materia}${pendientes ? `<span class="pendiente-badge">${pendientes}</span>` : ''}</div>
+                            `;
+                            el.style.cursor = 'pointer';
+                            el.onclick = () => abrirModalMateria(clase.materia);
+                        }
                         
-                        el.innerHTML = `
-                            <div class="clase-hora">${clase.hora}</div>
-                            <div class="clase-nombre">${clase.materia}${pendientes ? `<span class="pendiente-badge">${pendientes}</span>` : ''}</div>
-                        `;
-                        el.style.cursor = 'pointer';
-                        el.onclick = () => abrirModalMateria(clase.materia);
-                    }
-                    
-                    content.appendChild(el);
-                });
+                        content.appendChild(el);
+                    });
+                }
                 
                 card.appendChild(content);
                 grid.appendChild(card);
@@ -1018,7 +973,6 @@
                 });
         }
 
-        // NOTAS Y OBSERVACIONES
         function guardarNota() {
             const texto = document.getElementById('notaTexto').value.trim();
             const fecha = document.getElementById('notaFecha').value;
@@ -1042,7 +996,6 @@
             document.getElementById('notaFecha').value = '';
             document.getElementById('notaHora').value = '';
             renderRecordatorios();
-            verificarRecordatorios();
         }
 
         function eliminarNota(id) {
@@ -1051,14 +1004,12 @@
             renderRecordatorios();
         }
 
-        // MODAL DE MATERIA
         function abrirModalMateria(nombreMateria) {
             materiaActualModal = nombreMateria.toLowerCase();
             document.getElementById('materiaNombre').textContent = nombreMateria;
             document.getElementById('materiaModal').classList.add('active');
             renderNotasMateria();
             
-            // Limpiar formulario
             document.getElementById('tipoNota').value = 'deberes';
             document.getElementById('textoNota').value = '';
             document.getElementById('fechaNota').value = '';
@@ -1146,50 +1097,11 @@
             renderMaterias();
         }
 
-        // RECORDATORIOS AUTOMÁTICOS
-        function verificarRecordatorios() {
-            const ahora = new Date();
-            const horaActual = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-            const hoyISO = ahora.toISOString().split('T')[0];
-            
-            // Recordatorios de observaciones (un día antes)
-            observaciones.forEach(obs => {
-                const fechaObs = new Date(obs.fecha);
-                const ayer = new Date(ahora);
-                ayer.setDate(ayer.getDate() - 1);
-                
-                if (
-                    fechaObs.toISOString().split('T')[0] === ayer.toISOString().split('T')[0] &&
-                    obs.hora && horaActual >= obs.hora
-                ) {
-                    mostrarRecordatorio(`⏰ Recordatorio: ${obs.texto} es mañana a las ${obs.hora}`);
-                }
-            });
-            
-            // Recordatorio domingo 11:00
-            if (ahora.getDay() === 0 && horaActual >= '11:00' && horaActual <= '11:05') {
-                mostrarRecordatorio('📅 Recuerda revisar tu horario para la semana que comienza. ¡Prepárate!');
-            }
-        }
-
-        function mostrarRecordatorio(mensaje) {
-            console.log('Recordatorio:', mensaje);
-            // Aquí se mostraría una notificación en el navegador
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('📚 Horario de Mateo', {
-                    body: mensaje,
-                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%235DADE2" width="192" height="192"/><text x="50%" y="50%" font-size="100" fill="white" text-anchor="middle" dominant-baseline="central" font-weight="bold">📚</text></svg>'
-                });
-            }
-        }
-
-        // SINCRONIZACIÓN CON GOOGLE DRIVE
         function sincronizarDrive() {
             const btn = document.getElementById('syncBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Sincronizando...';
             
-            // Simular sincronización (en producción, usar Google Drive API)
             setTimeout(() => {
                 const datos = {
                     notasMateria,
@@ -1201,7 +1113,6 @@
                 console.log('Datos a sincronizar:', datos);
                 alert('✅ Datos guardados. Descarga el archivo JSON para hacer backup en Drive');
                 
-                // Descargar JSON
                 const element = document.createElement('a');
                 element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(datos, null, 2)));
                 element.setAttribute('download', `mateo-backup-${new Date().toISOString().split('T')[0]}.json`);
@@ -1215,7 +1126,6 @@
             }, 1500);
         }
 
-        // AYUDA
         function mostrarAyuda() {
             alert(`
 📚 CÓMO USAR LA APP:
@@ -1223,13 +1133,14 @@
 1️⃣ VER HORARIO
    • Toca una clase para añadir deberes o exámenes
    • Usa Anterior/Siguiente para navegar semanas
+   • Sábado y Domingo: Sin clases, añade cumpleaños, partidos, etc
 
 2️⃣ AÑADIR DEBERES/EXÁMENES
    • Haz clic en una materia → Elige tipo → Escribe tarea
    • Añade fecha y hora de recordatorio
 
 3️⃣ RECORDATORIOS Y EVENTOS
-   • En la sección "Recordatorios" escribe cumpleaños, excursiones, etc
+   • En "Recordatorios" escribe cumpleaños, excursiones, partidos
    • Añade fecha y hora
    • Se te recordará un día antes
 
@@ -1237,29 +1148,21 @@
    • Haz clic en "Sincronizar Ahora" para guardar en Drive
    • Se descargará un archivo JSON de respaldo
 
-5️⃣ NOTIFICACIONES
-   • Domingo 11:00 → Aviso de la semana siguiente
-   • Viernes 17:30 → Recordatorio Eskola Athletic 18:30
-
 ¡Mantente organizado! 🎯
             `);
         }
 
-        // SERVICE WORKER (Funciona sin internet)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW error:', err));
         }
 
-        // SOLICITAR PERMISO DE NOTIFICACIONES
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }
 
-        // INICIALIZAR
         document.addEventListener('DOMContentLoaded', () => {
             renderizar();
-            // Verificar recordatorios cada minuto
-            setInterval(verificarRecordatorios, 60000);
+            setInterval(() => renderizar(), 60000);
         });
     </script>
 </body>
